@@ -1,0 +1,124 @@
+@import "tailwindcss";
+
+/* ========================================
+   REZAN MIR UĞURLU - ARTIST PORTFOLIO
+   Design System: Brutalist Minimalism
+   ======================================== */
+
+/* === DESIGN TOKENS === */
+:root {
+  /* Spacing */
+  --space-page: 48px;
+  --space-section: 120px;
+  --space-block: 80px;
+  --space-element: 40px;
+  --space-tight: 16px;
+
+  /* Layout */
+  --max-content: 1400px;
+  --max-wide: 1800px;
+  --nav-height: 96px;
+
+  /* Typography */
+  --font-label: 11px;
+  --font-body: 16px;
+  --font-body-lg: 18px;
+  --letter-label: 0.2em;
+  --letter-wide: 0.15em;
+
+  /* Colors */
+  --color-bg: #ffffff;
+  --color-fg: #000000;
+  --color-muted: rgba(0, 0, 0, 0.4);
+  --color-subtle: rgba(0, 0, 0, 0.1);
+  --color-ghost: rgba(0, 0, 0, 0.05);
+  --color-hover: rgba(0, 0, 0, 0.02);
+}
+
+/* === BASE STYLES === */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: "Outfit", system-ui, sans-serif;
+  background-color: var(--color-bg);
+  color: var(--color-fg);
+  line-height: 1.5;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* === TYPOGRAPHY === */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+/* === SELECTION === */
+::selection {
+  background-color: var(--color-fg);
+  color: var(--color-bg);
+}
+
+/* === SCROLLBAR === */
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-fg);
+}
+
+/* === RESETS === */
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  background: none;
+  border: none;
+}
+
+/* === A11Y: Focus-Visible (Task 1.3) === */
+*:focus-visible {
+  outline: 2px solid var(--color-fg);
+  outline-offset: 4px;
+}
+
+*:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* === A11Y: Reduced Motion (Task 1.2) === */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
