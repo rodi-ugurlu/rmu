@@ -24,6 +24,14 @@ const itemVariants = {
     },
 };
 
+const homeFilmNotes: Record<string, string> = {
+    '36': 'Experimental, Short Film',
+    rec: 'Experimental, Short Film',
+    stoppani: 'Experimental, Short Film, Documentary',
+    idyma: 'Experimental',
+};
+const homeFilmOrder = ['36', 'rec', 'stoppani', 'idyma'] as const;
+
 export default function FeaturedFilms() {
     const [hoveredId, setHoveredId] = useState<string | null>(null);
     const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
@@ -40,6 +48,12 @@ export default function FeaturedFilms() {
     };
 
     const hoveredFilm = films.find((f) => f.id === hoveredId);
+    const orderedHomeFilms = [
+        ...homeFilmOrder
+            .map((id) => films.find((film) => film.id === id))
+            .filter((film): film is (typeof films)[number] => Boolean(film)),
+        ...films.filter((film) => !homeFilmOrder.includes(film.id as (typeof homeFilmOrder)[number])),
+    ];
 
     return (
         <section
@@ -68,7 +82,6 @@ export default function FeaturedFilms() {
                             color: 'var(--color-muted)',
                         }}
                     >
-                        Selected Works
                     </h2>
                     <span
                         style={{
@@ -118,7 +131,7 @@ export default function FeaturedFilms() {
                         )}
                     </motion.div>
 
-                    {films.map((film) => {
+                    {orderedHomeFilms.map((film) => {
                         const isHovered = hoveredId === film.id;
                         const isDimmed = hoveredId !== null && !isHovered;
 
@@ -126,7 +139,7 @@ export default function FeaturedFilms() {
                             <motion.div key={film.id} variants={itemVariants}>
                                 <Link
                                     to={`/films/${film.id}`}
-                                    className="group relative flex items-center justify-between cursor-pointer"
+                                    className="group relative cursor-pointer block"
                                     style={{
                                         padding: 'var(--space-page) 0',
                                         borderBottom: '1px solid var(--color-subtle)',
@@ -134,54 +147,70 @@ export default function FeaturedFilms() {
                                     onMouseEnter={() => setHoveredId(film.id)}
                                     onMouseLeave={() => setHoveredId(null)}
                                 >
-                                    {/* Film Title — solid black base, red on hover */}
-                                    <h3
-                                        className="font-bold uppercase tracking-tighter"
-                                        style={{
-                                            fontSize: 'clamp(3rem, 8vw, 7rem)',
-                                            lineHeight: 0.9,
-                                            color: isHovered ? HOVER_RED : 'var(--color-fg)',
-                                            opacity: isDimmed ? 0.15 : 1,
-                                            transition: 'color 0.2s ease-in-out, opacity 0.3s ease',
-                                        }}
-                                    >
-                                        {film.title}
-                                    </h3>
+                                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 md:gap-8">
+                                        <div className="flex flex-col md:flex-row md:items-end gap-2 md:gap-5">
+                                            <h3
+                                                className="font-bold uppercase tracking-tighter"
+                                                style={{
+                                                    fontSize: 'clamp(3rem, 8vw, 7rem)',
+                                                    lineHeight: 0.9,
+                                                    color: isHovered ? HOVER_RED : 'var(--color-fg)',
+                                                    opacity: isDimmed ? 0.15 : 1,
+                                                    transition: 'color 0.2s ease-in-out, opacity 0.3s ease',
+                                                }}
+                                            >
+                                                {film.title}
+                                            </h3>
+                                            <p
+                                                className="md:mb-2"
+                                                style={{
+                                                    fontSize: 'clamp(11px, 1vw, 14px)',
+                                                    lineHeight: 1.4,
+                                                    color: isHovered ? HOVER_RED : 'rgba(0,0,0,0.72)',
+                                                    opacity: isDimmed ? 0.2 : 1,
+                                                    marginTop: 0,
+                                                    marginBottom: 0,
+                                                    transition: 'color 0.2s ease-in-out, opacity 0.3s ease',
+                                                }}
+                                            >
+                                                {homeFilmNotes[film.id]}
+                                            </p>
+                                        </div>
 
-                                    {/* Metadata — Right aligned */}
-                                    <div
-                                        className="hidden md:flex flex-col items-end"
-                                        style={{
-                                            gap: '4px',
-                                            opacity: isHovered ? 1 : 0,
-                                            transform: isHovered
-                                                ? 'translateY(0)'
-                                                : 'translateY(16px)',
-                                            transition:
-                                                'opacity 0.3s ease, transform 0.3s ease',
-                                        }}
-                                    >
-                                        <span
-                                            className="font-medium uppercase"
+                                        <div
+                                            className="hidden md:flex flex-col items-end"
                                             style={{
-                                                fontSize: '14px',
-                                                letterSpacing: 'var(--letter-wide)',
-                                                color: isHovered ? HOVER_RED : 'var(--color-fg)',
-                                                transition: 'color 0.2s ease-in-out',
+                                                gap: '4px',
+                                                opacity: isHovered ? 1 : 0,
+                                                transform: isHovered
+                                                    ? 'translateY(0)'
+                                                    : 'translateY(16px)',
+                                                transition:
+                                                    'opacity 0.3s ease, transform 0.3s ease',
                                             }}
                                         >
-                                            {film.year}
-                                        </span>
-                                        <span
-                                            className="uppercase"
-                                            style={{
-                                                fontSize: 'var(--font-label)',
-                                                letterSpacing: 'var(--letter-wide)',
-                                                color: 'var(--color-muted)',
-                                            }}
-                                        >
-                                            {film.category}
-                                        </span>
+                                            <span
+                                                className="font-medium uppercase"
+                                                style={{
+                                                    fontSize: '14px',
+                                                    letterSpacing: 'var(--letter-wide)',
+                                                    color: isHovered ? HOVER_RED : 'var(--color-fg)',
+                                                    transition: 'color 0.2s ease-in-out',
+                                                }}
+                                            >
+                                                {film.year}
+                                            </span>
+                                            <span
+                                                className="uppercase"
+                                                style={{
+                                                    fontSize: 'var(--font-label)',
+                                                    letterSpacing: 'var(--letter-wide)',
+                                                    color: 'var(--color-muted)',
+                                                }}
+                                            >
+                                                {film.category}
+                                            </span>
+                                        </div>
                                     </div>
                                 </Link>
                             </motion.div>

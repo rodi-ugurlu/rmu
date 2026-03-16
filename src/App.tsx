@@ -2,7 +2,6 @@ import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 import ScrollToTop from './components/ui/ScrollToTop';
 import Navbar from './components/layout/Navbar';
-import Footer from './components/layout/Footer';
 import HomePage from './pages/HomePage';
 import FilmsPage from './pages/FilmsPage';
 import FilmDetailPage from './pages/FilmDetailPage';
@@ -10,7 +9,8 @@ import BiographyPage from './pages/BiographyPage';
 import ContactPage from './pages/ContactPage';
 import NotFoundPage from './pages/NotFoundPage';
 import PhotosPage from './pages/PhotosPage';
-import { ArtsPage, MusicsPage } from './pages/PlaceholderPages';
+import MusicsPage from './pages/MusicsPage';
+import ArtsPage from './pages/ArtsPage';
 
 function AnimatedRoutes() {
   const location = useLocation();
@@ -39,7 +39,6 @@ function App() {
       <div className="relative">
         <Navbar />
         <AnimatedRoutes />
-        <Footer />
       </div>
     </BrowserRouter>
   );

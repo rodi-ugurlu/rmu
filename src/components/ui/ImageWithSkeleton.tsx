@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import type { CSSProperties } from 'react';
 
 interface ImageWithSkeletonProps {
     src: string;
@@ -6,6 +7,8 @@ interface ImageWithSkeletonProps {
     className?: string;
     loading?: 'lazy' | 'eager';
     aspectRatio?: string;
+    fit?: 'cover' | 'contain';
+    imageStyle?: CSSProperties;
 }
 
 export default function ImageWithSkeleton({
@@ -14,6 +17,8 @@ export default function ImageWithSkeleton({
     className = '',
     loading = 'lazy',
     aspectRatio,
+    fit = 'cover',
+    imageStyle,
 }: ImageWithSkeletonProps) {
     const [loaded, setLoaded] = useState(false);
 
@@ -32,8 +37,9 @@ export default function ImageWithSkeleton({
                 loading={loading}
                 decoding="async"
                 onLoad={() => setLoaded(true)}
-                className={`w-full h-full object-cover transition-opacity duration-500 ${loaded ? 'opacity-100' : 'opacity-0'
+                className={`w-full ${aspectRatio ? 'h-full' : 'h-auto'} transition-opacity duration-500 ${loaded ? 'opacity-100' : 'opacity-0'
                     } ${className}`}
+                style={{ objectFit: fit, ...imageStyle }}
             />
         </div>
     );

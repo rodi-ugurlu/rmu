@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import './Hero.css';
 
 export default function Hero() {
     return (
@@ -22,7 +23,7 @@ export default function Hero() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.8, delay: 0.2 }}
-                    className="text-[10px] md:text-xs tracking-[0.4em] uppercase font-extralight mb-8"
+                    className="hero-kicker"
                     style={{ color: 'var(--color-muted)' }}
                 >
                     Filmmaker
@@ -33,10 +34,15 @@ export default function Hero() {
                     initial={{ opacity: 0, y: 40 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 1, delay: 0.4 }}
-                    className="text-[14vw] md:text-[12vw] lg:text-[10vw] font-bold leading-[0.85] tracking-[-0.04em] uppercase"
+                    className="hero-name"
                 >
-                    <span className="block">Rezan</span>
-                    <span className="block font-extralight opacity-50">Mir Uğurlu</span>
+                    <span className="hero-name-top">
+                        <span className="hero-name-word">REZAN</span>
+                        <span className="hero-name-word">MİR</span>
+                    </span>
+                    <span className="hero-name-bottom">
+                        UĞURLU
+                    </span>
                 </motion.h1>
 
 
@@ -55,7 +61,6 @@ export default function Hero() {
                     className="flex flex-col items-center gap-3 opacity-30"
                 >
                     <span className="text-[9px] tracking-[0.3em] uppercase font-light">
-                        Scroll
                     </span>
                     <div className="w-px h-10" style={{ backgroundColor: 'var(--color-muted)' }} />
                 </motion.div>

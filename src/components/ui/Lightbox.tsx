@@ -1,6 +1,36 @@
-import { useEffect, useCallback, useState } from 'react';
+import { useEffect, useCallback, useMemo, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { Photo } from '../../data/photography';
+
+const THUMBNAIL_WINDOW_SIZE = 7;
+
+function getOptimizedLightboxSrc(src: string): string {
+    if (src.startsWith('/photography/') && src.endsWith('.webp')) {
+        return src.replace('/photography/', '/photography-lightbox/').replace(/\.webp$/i, '.jpg');
+    }
+    if (src.startsWith('/arts/') && src.endsWith('.webp')) {
+        return src.replace('/arts/', '/arts-lightbox/').replace(/\.webp$/i, '.jpg');
+    }
+    return src;
+}
+
+function getThumbnailIndices(total: number, currentIndex: number): number[] {
+    if (total <= THUMBNAIL_WINDOW_SIZE) {
+        return Array.from({ length: total }, (_, i) => i);
+    }
+
+    const half = Math.floor(THUMBNAIL_WINDOW_SIZE / 2);
+    return Array.from({ length: THUMBNAIL_WINDOW_SIZE }, (_, i) => {
+        const offset = i - half;
+        return (currentIndex + offset + total) % total;
+    });
+}
+
+function navigationDirection(currentIndex: number, targetIndex: number, total: number): number {
+    const forward = (targetIndex - currentIndex + total) % total;
+    const backward = (currentIndex - targetIndex + total) % total;
+    return forward <= backward ? 1 : -1;
+}
 
 interface LightboxProps {
     photos: Photo[];
@@ -17,8 +47,15 @@ export default function Lightbox({
 }: LightboxProps) {
     const [direction, setDirection] = useState(0);
     const [imageLoaded, setImageLoaded] = useState(false);
+    const [showThumbnails, setShowThumbnails] = useState(false);
+    const mainImageRef = useRef<HTMLImageElement | null>(null);
     const photo = photos[currentIndex];
     const total = photos.length;
+    const displayPhotoSrc = useMemo(() => getOptimizedLightboxSrc(photo.src), [photo.src]);
+    const thumbnailIndices = useMemo(
+        () => getThumbnailIndices(total, currentIndex),
+        [total, currentIndex]
+    );
 
     const goTo = useCallback(
         (delta: number) => {
@@ -29,6 +66,15 @@ export default function Lightbox({
         },
         [currentIndex, total, onNavigate]
     );
+
+    useEffect(() => {
+        setImageLoaded(false);
+        setShowThumbnails(false);
+
+        if (mainImageRef.current?.complete) {
+            setImageLoaded(true);
+        }
+    }, [displayPhotoSrc]);
 
     /* Keyboard navigation */
     useEffect(() => {
@@ -49,41 +95,66 @@ export default function Lightbox({
         };
     }, []);
 
-    /* Preload adjacent images for buttery transitions */
+    /* Defer adjacent preloads so opening stays responsive */
     useEffect(() => {
-        const preload = (idx: number) => {
-            const img = new Image();
-            img.src = photos[(currentIndex + idx + total) % total].src;
-        };
-        preload(1);
-        preload(-1);
-    }, [currentIndex, photos, total]);
+        if (!imageLoaded) return;
+
+        const timer = window.setTimeout(() => {
+            const preload = (idx: number) => {
+                const img = new Image();
+                img.decoding = 'async';
+                img.src = getOptimizedLightboxSrc(photos[(currentIndex + idx + total) % total].src);
+            };
+
+            preload(1);
+            preload(-1);
+        }, 120);
+
+        return () => window.clearTimeout(timer);
+    }, [currentIndex, photos, total, imageLoaded]);
+
+    useEffect(() => {
+        if (!imageLoaded) return;
+
+        const timer = window.setTimeout(() => {
+            setShowThumbnails(true);
+        }, 180);
+
+        return () => window.clearTimeout(timer);
+    }, [imageLoaded, currentIndex]);
+
+    const handleClose = useCallback(
+        (e?: { stopPropagation?: () => void }) => {
+            e?.stopPropagation?.();
+            onClose();
+        },
+        [onClose]
+    );
+
+    const handleMainImageReady = useCallback(() => {
+        setImageLoaded(true);
+    }, []);
 
     /* Slide animation variants */
     const slideVariants = {
         enter: (d: number) => ({
-            x: d > 0 ? 300 : -300,
+            x: d > 0 ? 52 : -52,
             opacity: 0,
-            scale: 0.92,
         }),
         center: {
             x: 0,
             opacity: 1,
-            scale: 1,
             transition: {
-                x: { type: 'spring' as const, stiffness: 300, damping: 30 },
-                opacity: { duration: 0.3 },
-                scale: { duration: 0.4, ease: [0.25, 0.1, 0.25, 1] as const },
+                x: { duration: 0.22, ease: 'easeOut' as const },
+                opacity: { duration: 0.24, ease: 'easeOut' as const },
             },
         },
         exit: (d: number) => ({
-            x: d > 0 ? -200 : 200,
+            x: d > 0 ? -52 : 52,
             opacity: 0,
-            scale: 0.92,
             transition: {
-                x: { type: 'spring' as const, stiffness: 300, damping: 30 },
-                opacity: { duration: 0.2 },
-                scale: { duration: 0.3 },
+                x: { duration: 0.16, ease: 'easeOut' as const },
+                opacity: { duration: 0.16, ease: 'easeOut' as const },
             },
         }),
     };
@@ -93,15 +164,15 @@ export default function Lightbox({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
+            transition={{ duration: 0.24, ease: 'easeOut' }}
             className="fixed inset-0 z-[100] flex items-center justify-center"
             style={{ backgroundColor: 'rgba(0, 0, 0, 0.94)' }}
-            onClick={onClose}
+            onClick={handleClose}
         >
             {/* Close button */}
             <button
                 className="absolute top-6 right-6 z-[110] text-white/60 hover:text-white transition-colors cursor-pointer"
-                onClick={onClose}
+                onClick={handleClose}
                 aria-label="Close lightbox"
             >
                 <svg
@@ -175,7 +246,7 @@ export default function Lightbox({
                 style={{ padding: '80px 80px 60px' }}
                 onClick={(e) => e.stopPropagation()}
             >
-                <AnimatePresence initial={false} custom={direction} mode="popLayout">
+                <AnimatePresence initial={false} custom={direction} mode="wait">
                     <motion.div
                         key={photo.id}
                         custom={direction}
@@ -184,7 +255,11 @@ export default function Lightbox({
                         animate="center"
                         exit="exit"
                         className="absolute flex items-center justify-center"
-                        style={{ maxWidth: '100%', maxHeight: '100%' }}
+                        style={{
+                            maxWidth: '100%',
+                            maxHeight: '100%',
+                            willChange: 'transform, opacity',
+                        }}
                     >
                         {/* Skeleton loader */}
                         {!imageLoaded && (
@@ -197,55 +272,73 @@ export default function Lightbox({
                             </div>
                         )}
                         <img
-                            src={photo.src}
+                            ref={mainImageRef}
+                            src={displayPhotoSrc}
                             alt={photo.alt}
+                            loading="eager"
+                            decoding="async"
+                            fetchPriority="high"
                             className="max-w-full max-h-[calc(100vh-140px)] object-contain select-none"
                             style={{
                                 opacity: imageLoaded ? 1 : 0,
-                                transition: 'opacity 0.4s ease',
+                                transition: 'opacity 0.28s ease',
                             }}
                             draggable={false}
-                            onLoad={() => setImageLoaded(true)}
+                            onLoad={handleMainImageReady}
+                            onError={handleMainImageReady}
                         />
                     </motion.div>
                 </AnimatePresence>
             </div>
 
             {/* Bottom thumbnail strip */}
-            <div
-                className="absolute bottom-0 left-0 right-0 z-[110] hidden md:flex items-center justify-center gap-1 overflow-x-auto"
-                style={{
-                    padding: '12px 80px',
-                    background: 'linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 100%)',
-                }}
-                onClick={(e) => e.stopPropagation()}
-            >
-                {photos.map((p, i) => (
-                    <button
-                        key={p.id}
-                        onClick={() => {
-                            setDirection(i > currentIndex ? 1 : -1);
-                            setImageLoaded(false);
-                            onNavigate(i);
-                        }}
-                        className="shrink-0 overflow-hidden transition-all duration-300 cursor-pointer"
-                        style={{
-                            width: i === currentIndex ? '48px' : '32px',
-                            height: i === currentIndex ? '48px' : '32px',
-                            opacity: i === currentIndex ? 1 : 0.35,
-                            border: i === currentIndex ? '1px solid rgba(255,255,255,0.6)' : '1px solid transparent',
-                        }}
-                    >
-                        <img
-                            src={p.src}
-                            alt=""
-                            className="w-full h-full object-cover"
-                            loading="lazy"
-                            aria-hidden="true"
-                        />
-                    </button>
-                ))}
-            </div>
+            {imageLoaded && showThumbnails && (
+                <div
+                    className="absolute bottom-0 left-0 right-0 z-[110] hidden md:flex items-center justify-center gap-1 overflow-x-auto"
+                    style={{
+                        padding: '12px 80px',
+                        background: 'linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 100%)',
+                    }}
+                    onClick={(e) => e.stopPropagation()}
+                >
+                    {thumbnailIndices.map((thumbIndex) => {
+                        const thumbPhoto = photos[thumbIndex];
+                        const isActive = thumbIndex === currentIndex;
+
+                        return (
+                            <button
+                                key={thumbPhoto.id}
+                                onClick={() => {
+                                    setDirection(
+                                        navigationDirection(currentIndex, thumbIndex, total)
+                                    );
+                                    setImageLoaded(false);
+                                    onNavigate(thumbIndex);
+                                }}
+                                className="shrink-0 overflow-hidden transition-all duration-300 cursor-pointer"
+                                style={{
+                                    width: isActive ? '48px' : '34px',
+                                    height: isActive ? '48px' : '34px',
+                                    opacity: isActive ? 1 : 0.45,
+                                    border: isActive
+                                        ? '1px solid rgba(255,255,255,0.65)'
+                                        : '1px solid transparent',
+                                }}
+                            >
+                                <img
+                                    src={getOptimizedLightboxSrc(thumbPhoto.src)}
+                                    alt=""
+                                    className="w-full h-full object-cover"
+                                    loading="lazy"
+                                    decoding="async"
+                                    fetchPriority="low"
+                                    aria-hidden="true"
+                                />
+                            </button>
+                        );
+                    })}
+                </div>
+            )}
         </motion.div>
     );
 }
