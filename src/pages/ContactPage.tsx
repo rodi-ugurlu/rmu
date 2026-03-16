@@ -24,16 +24,7 @@ export default function ContactPage() {
                 transition={{ duration: 0.8 }}
                 className="contact-header"
             >
-                <div>
-                    <div className="contact-label">
-                        <SectionLabel>Direct Contact</SectionLabel>
-                    </div>
-                    <h1 className="contact-title">Contact</h1>
-                </div>
-                <p className="contact-dek">
-                    Get in touch for film screenings, collaborations, commissioned visual work, or
-                    legal consultation requests.
-                </p>
+                <h1 className="contact-title">Contact</h1>
             </motion.section>
 
             <section className="contact-layout">
@@ -46,10 +37,10 @@ export default function ContactPage() {
                     <div className="contact-info-row">
                         <p className="contact-info-kicker">Email</p>
                         <a
-                            href="mailto:info@rezanmir.com"
+                            href="mailto:avrezanugurlu@gmail.com"
                             className="contact-email"
                         >
-                            info@rezanmir.com
+                            avrezanugurlu@gmail.com
                         </a>
                     </div>
 
@@ -76,13 +67,6 @@ export default function ContactPage() {
                         </div>
                     </div>
 
-                    <div className="contact-availability">
-                        <p className="contact-info-kicker">Availability</p>
-                        <p className="contact-availability-copy">
-                            Open for selected projects and festival communication in Turkish and
-                            English.
-                        </p>
-                    </div>
                 </motion.aside>
 
                 <motion.div

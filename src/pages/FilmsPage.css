@@ -15,7 +15,7 @@
   letter-spacing: -0.03em;
   text-transform: uppercase;
   font-weight: 700;
-  margin-bottom: clamp(10px, 1.4vh, 18px);
+  margin-bottom: clamp(14px, 2vh, 24px);
 }
 
 .films-minimal-grid {
@@ -79,7 +79,7 @@
 
   .films-minimal-title {
     font-size: clamp(1.6rem, 8vw, 2.2rem);
-    margin-bottom: 10px;
+    margin-bottom: 14px;
   }
 
   .films-minimal-grid {

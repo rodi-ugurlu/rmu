@@ -290,7 +290,7 @@ export default function PhotosPage() {
                         <h1
                             className="font-bold uppercase tracking-tighter"
                             style={{
-                                fontSize: 'clamp(3rem, 10vw, 8rem)',
+                                fontSize: 'clamp(1.95rem, 4.6vw, 4rem)',
                                 lineHeight: 0.9,
                             }}
                         >
@@ -312,7 +312,6 @@ export default function PhotosPage() {
                                     color: 'var(--color-muted)',
                                 }}
                             >
-                                {visibleCount.toString().padStart(2, '0')} /{' '}
                                 {photos.length.toString().padStart(2, '0')} Loaded Photographs
                             </p>
                             <p
@@ -323,11 +322,7 @@ export default function PhotosPage() {
                                     color: 'var(--color-muted)',
                                 }}
                             >
-                                {remainingCount > 0
-                                    ? `Next batch: ${nextBatchPreview
-                                        .toString()
-                                        .padStart(2, '0')} photos`
-                                    : 'All photos loaded'}
+
                             </p>
                         </div>
                     </motion.div>

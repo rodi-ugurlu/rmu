@@ -1,9 +1,5 @@
 .contact-header {
-  display: grid;
-  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
-  gap: clamp(18px, 3.5vw, 56px);
-  align-items: end;
-  margin-bottom: clamp(42px, 6vw, 84px);
+  margin-bottom: clamp(20px, 3.5vh, 36px);
 }
 
 .contact-label > p {
@@ -11,19 +7,10 @@
 }
 
 .contact-title {
-  font-size: clamp(3rem, 10vw, 7.6rem);
-  line-height: 0.88;
+  font-size: clamp(1.95rem, 4.6vw, 4rem);
+  line-height: 0.92;
   text-transform: uppercase;
-  letter-spacing: -0.045em;
-}
-
-.contact-dek {
-  justify-self: end;
-  max-width: 38ch;
-  font-size: clamp(1rem, 1.14vw, 1.16rem);
-  line-height: 1.84;
-  color: rgba(0, 0, 0, 0.8);
-  text-wrap: pretty;
+  letter-spacing: -0.03em;
 }
 
 .contact-layout {
@@ -99,18 +86,6 @@
   width: 24px;
   height: 1px;
   background: currentColor;
-}
-
-.contact-availability {
-  border-top: 1px solid var(--color-subtle);
-  padding-top: 16px;
-}
-
-.contact-availability-copy {
-  font-size: 0.97rem;
-  line-height: 1.7;
-  color: rgba(0, 0, 0, 0.72);
-  max-width: 34ch;
 }
 
 .contact-form-head {
@@ -202,14 +177,8 @@
 }
 
 @media (max-width: 1200px) {
-  .contact-header,
   .contact-layout {
     grid-template-columns: 1fr;
-  }
-
-  .contact-dek {
-    justify-self: start;
-    max-width: 52ch;
   }
 }
 
