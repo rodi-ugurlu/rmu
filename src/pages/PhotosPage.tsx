@@ -9,14 +9,6 @@ const SECOND_BATCH_COUNT = 4;
 const STREAM_BATCH_SIZE = 4;
 const BATCH_DELAY_MS = 320;
 
-function distributeColumns(count: number, cols: number): number[][] {
-    const result: number[][] = Array.from({ length: cols }, () => []);
-    for (let i = 0; i < count; i++) {
-        result[i % cols].push(i);
-    }
-    return result;
-}
-
 const itemVariants = {
     hidden: { opacity: 0, y: 30, scale: 0.97 },
     visible: (index: number) => ({
@@ -32,123 +24,116 @@ const itemVariants = {
 };
 
 interface PhotoGridProps {
-    columns: number[][];
+    visibleCount: number;
     loadedImages: Set<number>;
     onImageLoad: (index: number) => void;
     onOpenLightbox: (index: number) => void;
 }
 
 const PhotoGrid = memo(function PhotoGrid({
-    columns,
+    visibleCount,
     loadedImages,
     onImageLoad,
     onOpenLightbox,
 }: PhotoGridProps) {
     return (
-        <div className="flex gap-3 md:gap-4">
-            {columns.map((colIndices, colIdx) => (
-                <div
-                    key={colIdx}
-                    className="flex-1 flex flex-col gap-3 md:gap-4"
-                >
-                    {colIndices.map((photoIndex) => {
-                        const photo = photos[photoIndex];
-                        const isLoaded = loadedImages.has(photoIndex);
+        <div className="columns-1 sm:columns-2 lg:columns-4 gap-3 md:gap-4">
+            {Array.from({ length: visibleCount }, (_, photoIndex) => {
+                const photo = photos[photoIndex];
+                const isLoaded = loadedImages.has(photoIndex);
 
-                        return (
-                            <motion.div
-                                key={photo.id}
-                                variants={itemVariants}
-                                custom={photoIndex}
-                                initial="hidden"
-                                whileInView="visible"
-                                viewport={{ once: true, margin: '-80px' }}
-                                className="group relative overflow-hidden cursor-pointer"
-                                onClick={() => onOpenLightbox(photoIndex)}
-                                whileHover={{ y: -3 }}
-                                transition={{ duration: 0.3 }}
-                            >
-                                {!isLoaded && (
-                                    <div
-                                        className="absolute inset-0 animate-pulse"
-                                        style={{
-                                            backgroundColor: 'var(--color-ghost)',
-                                            minHeight: '240px',
-                                        }}
-                                    />
-                                )}
+                return (
+                    <motion.div
+                        key={photo.id}
+                        variants={itemVariants}
+                        custom={photoIndex}
+                        initial="hidden"
+                        whileInView="visible"
+                        viewport={{ once: true, margin: '-80px' }}
+                        className="group relative inline-block w-full overflow-hidden cursor-pointer break-inside-avoid mb-3 md:mb-4"
+                        onClick={() => onOpenLightbox(photoIndex)}
+                        whileHover={{ y: -3 }}
+                        transition={{ duration: 0.3 }}
+                    >
+                        {!isLoaded && (
+                            <div
+                                className="absolute inset-0 animate-pulse"
+                                style={{
+                                    backgroundColor: 'var(--color-ghost)',
+                                    minHeight: '240px',
+                                }}
+                            />
+                        )}
 
-                                <img
-                                    src={photo.src}
-                                    alt={photo.alt}
-                                    fetchPriority={
-                                        photoIndex < FIRST_BATCH_COUNT ? 'high' : 'auto'
-                                    }
-                                    loading={
-                                        photoIndex < FIRST_BATCH_COUNT
-                                            ? 'eager'
-                                            : 'lazy'
-                                    }
-                                    decoding="async"
-                                    onLoad={() => onImageLoad(photoIndex)}
-                                    onError={() => onImageLoad(photoIndex)}
-                                    className="w-full h-auto block transition-all duration-700 group-hover:scale-[1.04]"
-                                    style={{
-                                        opacity: isLoaded ? 1 : 0,
-                                    }}
-                                />
+                        <img
+                            src={photo.src}
+                            alt={photo.alt}
+                            fetchPriority={
+                                photoIndex < FIRST_BATCH_COUNT ? 'high' : 'auto'
+                            }
+                            loading={
+                                photoIndex < FIRST_BATCH_COUNT
+                                    ? 'eager'
+                                    : 'lazy'
+                            }
+                            decoding="async"
+                            onLoad={() => onImageLoad(photoIndex)}
+                            onError={() => onImageLoad(photoIndex)}
+                            className="w-full h-auto block transition-all duration-700 group-hover:scale-[1.04]"
+                            style={{
+                                opacity: isLoaded ? 1 : 0,
+                            }}
+                        />
 
-                                <div
-                                    className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-500 pointer-events-none"
-                                />
+                        <div
+                            className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-500 pointer-events-none"
+                        />
 
-                                <div
-                                    className="absolute inset-0 flex items-center justify-center 
-                                               opacity-0 group-hover:opacity-100 
+                        <div
+                            className="absolute inset-0 flex items-center justify-center
+                                               opacity-0 group-hover:opacity-100
                                                transition-opacity duration-500 pointer-events-none"
-                                >
-                                    <div
-                                        className="w-12 h-12 rounded-full border border-white/50 
+                        >
+                            <div
+                                className="w-12 h-12 rounded-full border border-white/50
                                                    flex items-center justify-center backdrop-blur-sm"
-                                        style={{
-                                            backgroundColor: 'rgba(255,255,255,0.1)',
-                                        }}
-                                    >
-                                        <svg
-                                            width="18"
-                                            height="18"
-                                            viewBox="0 0 24 24"
-                                            fill="none"
-                                            stroke="white"
-                                            strokeWidth="1.5"
-                                        >
-                                            <circle cx="11" cy="11" r="8" />
-                                            <line x1="21" y1="21" x2="16.65" y2="16.65" />
-                                            <line x1="11" y1="8" x2="11" y2="14" />
-                                            <line x1="8" y1="11" x2="14" y2="11" />
-                                        </svg>
-                                    </div>
-                                </div>
-
-                                <div
-                                    className="absolute bottom-3 right-3 
-                                               opacity-0 group-hover:opacity-100 
-                                               translate-y-2 group-hover:translate-y-0 
-                                               transition-all duration-500"
-                                    style={{
-                                        fontSize: '9px',
-                                        letterSpacing: '0.15em',
-                                        color: 'rgba(255,255,255,0.7)',
-                                        fontWeight: 500,
-                                    }}
+                                style={{
+                                    backgroundColor: 'rgba(255,255,255,0.1)',
+                                }}
+                            >
+                                <svg
+                                    width="18"
+                                    height="18"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="white"
+                                    strokeWidth="1.5"
                                 >
-                                    {String(photoIndex + 1).padStart(2, '0')}
-                                </div>
-                            </motion.div>
-                        );
-                    })}
-                </div>
-            ))}
+                                    <circle cx="11" cy="11" r="8" />
+                                    <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                                    <line x1="11" y1="8" x2="11" y2="14" />
+                                    <line x1="8" y1="11" x2="14" y2="11" />
+                                </svg>
+                            </div>
+                        </div>
+
+                        <div
+                            className="absolute bottom-3 right-3
+                                               opacity-0 group-hover:opacity-100
+                                               translate-y-2 group-hover:translate-y-0
+                                               transition-all duration-500"
+                            style={{
+                                fontSize: '9px',
+                                letterSpacing: '0.15em',
+                                color: 'rgba(255,255,255,0.7)',
+                                fontWeight: 500,
+                            }}
+                        >
+                            {String(photoIndex + 1).padStart(2, '0')}
+                        </div>
+                    </motion.div>
+                );
+            })}
         </div>
     );
 });
@@ -161,7 +146,6 @@ export default function PhotosPage() {
     );
 
     const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
-    const [columnCount, setColumnCount] = useState(3);
     const [visibleCount, setVisibleCount] = useState(firstBatchCount);
     const [loadedImages, setLoadedImages] = useState<Set<number>>(new Set());
     const [loadingBatchSize, setLoadingBatchSize] = useState(0);
@@ -169,19 +153,6 @@ export default function PhotosPage() {
     const loadTriggerRef = useRef<HTMLDivElement>(null);
     const batchTimeoutRef = useRef<number | null>(null);
     const batchInFlightRef = useRef(false);
-
-    useEffect(() => {
-        const updateCols = () => {
-            const w = window.innerWidth;
-            if (w < 640) setColumnCount(1);
-            else if (w < 1024) setColumnCount(2);
-            else if (w < 1536) setColumnCount(3);
-            else setColumnCount(4);
-        };
-        updateCols();
-        window.addEventListener('resize', updateCols);
-        return () => window.removeEventListener('resize', updateCols);
-    }, []);
 
     const firstBatchReady = useMemo(() => {
         for (let i = 0; i < firstBatchCount; i++) {
@@ -242,10 +213,6 @@ export default function PhotosPage() {
         []
     );
 
-    const columns = useMemo(
-        () => distributeColumns(visibleCount, columnCount),
-        [visibleCount, columnCount]
-    );
     const remainingCount = photos.length - visibleCount;
     const nextBatchPreview = secondBatchReleased
         ? Math.min(STREAM_BATCH_SIZE, remainingCount)
@@ -339,7 +306,7 @@ export default function PhotosPage() {
                     }}
                 >
                     <PhotoGrid
-                        columns={columns}
+                        visibleCount={visibleCount}
                         loadedImages={loadedImages}
                         onImageLoad={handleImageLoad}
                         onOpenLightbox={handleOpenLightbox}

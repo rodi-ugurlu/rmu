@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 import ScrollToTop from './components/ui/ScrollToTop';
 import Navbar from './components/layout/Navbar';
+import SiteCredit from './components/layout/SiteCredit';
 import HomePage from './pages/HomePage';
 import FilmsPage from './pages/FilmsPage';
 import FilmDetailPage from './pages/FilmDetailPage';
@@ -39,6 +40,7 @@ function App() {
       <div className="relative">
         <Navbar />
         <AnimatedRoutes />
+        <SiteCredit />
       </div>
     </BrowserRouter>
   );

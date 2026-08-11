@@ -42,7 +42,7 @@ export const films: Film[] = [
             'İstanbul Tıp Fakültesi Kısa Film Günleri (2024)',
             'İstanbul Modern Müzesi Kısa Film Günleri (2024)',
             'Bodrum Gümüşlük Film Akademisi (2024)',
-            '36. Münih Türk Film Günleri (2005)',
+            '36. Münih Türk Film Günleri (2025)',
             'Yapı Kredi Kültür Sanat – Bir de Buradan Bak (2025)',
             'İFSAK Kısa Film Festivali (2025)',
             'Fenerbahçe Üniversitesi Kısa Film Festivali (2025)',

@@ -10,9 +10,9 @@ const contactFields = [
 ];
 
 const socialLinks = [
-    { name: 'Instagram', url: '#' },
-    { name: 'Vimeo', url: '#' },
-    { name: 'IMDb', url: '#' },
+    { name: 'Instagram', url: 'https://www.instagram.com/rezanmirugurlu?igsh=MXI3YWZreHd1ZXdmdw==' },
+    { name: 'Vimeo', url: 'https://vimeo.com/user112598276' },
+    { name: 'Twitter', url: 'https://x.com/ugurlurezan' },
 ];
 
 export default function ContactPage() {

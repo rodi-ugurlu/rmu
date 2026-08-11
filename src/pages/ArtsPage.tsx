@@ -2,7 +2,7 @@ import PageShell from '../components/ui/PageShell';
 import { artworks } from '../data/arts';
 import './ArtsPage.css';
 
-const strictArtworkOrder = [1, 3, 2, 4, 5] as const;
+const strictArtworkOrder = [1, 3, 2, 4, 5, 6, 7, 8, 9] as const;
 
 export default function ArtsPage() {
     const orderedArtworks = strictArtworkOrder

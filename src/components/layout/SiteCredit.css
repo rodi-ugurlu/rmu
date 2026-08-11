@@ -1,0 +1,27 @@
+.site-credit {
+  display: flex;
+  justify-content: center;
+  padding: 22px var(--space-page) 26px;
+  background: var(--color-bg);
+}
+
+.site-credit-text {
+  margin: 0;
+  color: rgba(0, 0, 0, 0.58);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+.site-credit-link {
+  display: inline-block;
+  margin-left: 0.25em;
+  transition: color 180ms ease;
+}
+
+.site-credit-link:hover,
+.site-credit-link:focus-visible {
+  color: #c41e1e;
+}
