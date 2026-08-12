@@ -3,11 +3,14 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { photos } from '../data/photography';
 import PageTransition from '../components/ui/PageTransition';
 import Lightbox from '../components/ui/Lightbox';
+import { getResponsiveImageProps } from '../utils/responsiveImages';
 
 const FIRST_BATCH_COUNT = 4;
 const SECOND_BATCH_COUNT = 4;
 const STREAM_BATCH_SIZE = 4;
 const BATCH_DELAY_MS = 320;
+const PHOTO_GRID_SIZES =
+    '(min-width: 1800px) 420px, (min-width: 1024px) calc((100vw - 144px) / 4), (min-width: 640px) calc((100vw - 112px) / 2), calc(100vw - 96px)';
 
 const itemVariants = {
     hidden: { opacity: 0, y: 30, scale: 0.97 },
@@ -41,6 +44,7 @@ const PhotoGrid = memo(function PhotoGrid({
             {Array.from({ length: visibleCount }, (_, photoIndex) => {
                 const photo = photos[photoIndex];
                 const isLoaded = loadedImages.has(photoIndex);
+                const responsiveImage = getResponsiveImageProps(photo.src, 1280);
 
                 return (
                     <motion.div
@@ -66,7 +70,11 @@ const PhotoGrid = memo(function PhotoGrid({
                         )}
 
                         <img
-                            src={photo.src}
+                            src={responsiveImage.src}
+                            srcSet={responsiveImage.srcSet}
+                            sizes={PHOTO_GRID_SIZES}
+                            width={responsiveImage.width}
+                            height={responsiveImage.height}
                             alt={photo.alt}
                             fetchPriority={
                                 photoIndex < FIRST_BATCH_COUNT ? 'high' : 'auto'

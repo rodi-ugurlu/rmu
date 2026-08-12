@@ -1,18 +1,9 @@
-import { useEffect, useCallback, useMemo, useRef, useState } from 'react';
+import { useEffect, useCallback, useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { Photo } from '../../data/photography';
+import { getResponsiveThumbnailSrc } from '../../utils/responsiveImages';
 
 const THUMBNAIL_WINDOW_SIZE = 7;
-
-function getOptimizedLightboxSrc(src: string): string {
-    if (src.startsWith('/photography/') && src.endsWith('.webp')) {
-        return src.replace('/photography/', '/photography-lightbox/').replace(/\.webp$/i, '.jpg');
-    }
-    if (src.startsWith('/arts/') && src.endsWith('.webp')) {
-        return src.replace('/arts/', '/arts-lightbox/').replace(/\.webp$/i, '.jpg');
-    }
-    return src;
-}
 
 function getThumbnailIndices(total: number, currentIndex: number): number[] {
     if (total <= THUMBNAIL_WINDOW_SIZE) {
@@ -48,10 +39,9 @@ export default function Lightbox({
     const [direction, setDirection] = useState(0);
     const [imageLoaded, setImageLoaded] = useState(false);
     const [showThumbnails, setShowThumbnails] = useState(false);
-    const mainImageRef = useRef<HTMLImageElement | null>(null);
     const photo = photos[currentIndex];
     const total = photos.length;
-    const displayPhotoSrc = useMemo(() => getOptimizedLightboxSrc(photo.src), [photo.src]);
+    const displayPhotoSrc = photo.src;
     const thumbnailIndices = useMemo(
         () => getThumbnailIndices(total, currentIndex),
         [total, currentIndex]
@@ -61,20 +51,12 @@ export default function Lightbox({
         (delta: number) => {
             setDirection(delta);
             setImageLoaded(false);
+            setShowThumbnails(false);
             const next = (currentIndex + delta + total) % total;
             onNavigate(next);
         },
         [currentIndex, total, onNavigate]
     );
-
-    useEffect(() => {
-        setImageLoaded(false);
-        setShowThumbnails(false);
-
-        if (mainImageRef.current?.complete) {
-            setImageLoaded(true);
-        }
-    }, [displayPhotoSrc]);
 
     /* Keyboard navigation */
     useEffect(() => {
@@ -103,7 +85,7 @@ export default function Lightbox({
             const preload = (idx: number) => {
                 const img = new Image();
                 img.decoding = 'async';
-                img.src = getOptimizedLightboxSrc(photos[(currentIndex + idx + total) % total].src);
+                img.src = photos[(currentIndex + idx + total) % total].src;
             };
 
             preload(1);
@@ -272,7 +254,6 @@ export default function Lightbox({
                             </div>
                         )}
                         <img
-                            ref={mainImageRef}
                             src={displayPhotoSrc}
                             alt={photo.alt}
                             loading="eager"
@@ -313,6 +294,7 @@ export default function Lightbox({
                                         navigationDirection(currentIndex, thumbIndex, total)
                                     );
                                     setImageLoaded(false);
+                                    setShowThumbnails(false);
                                     onNavigate(thumbIndex);
                                 }}
                                 className="shrink-0 overflow-hidden transition-all duration-300 cursor-pointer"
@@ -326,7 +308,7 @@ export default function Lightbox({
                                 }}
                             >
                                 <img
-                                    src={getOptimizedLightboxSrc(thumbPhoto.src)}
+                                    src={getResponsiveThumbnailSrc(thumbPhoto.src)}
                                     alt=""
                                     className="w-full h-full object-cover"
                                     loading="lazy"
